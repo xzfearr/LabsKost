@@ -17,25 +17,44 @@ size_t countOnes(std::string_view sv)
 
 std::string_view secondWord(std::string_view sv)
 {
-    size_t first = sv.find(' ');
-    if (first == std::string_view::npos)
+    size_t len = sv.size();
+    size_t start = 0;
+    size_t end = 0;
+
+    bool firstSpaceFound = false;
+
+    for (size_t i = 0; i < len; i++)
+    {
+        if (sv[i] == ' ')
+        {
+            if (!firstSpaceFound)
+            {
+                firstSpaceFound = true;
+                start = i + 1;
+
+                if (start >= len)
+                    return "";
+
+                if (sv[start] == ' ')
+                    return "";
+            }
+            else
+            {
+                end = i;
+                break;
+            }
+        }
+    }
+
+    if (!firstSpaceFound)
         return "";
 
-    size_t start = first + 1;
+    if (end == 0)
+        end = len;
 
-    while (start < sv.size() && sv[start] == ' ')
-        start++;
-
-    if (start >= sv.size())
-        return "";
-
-    size_t second = sv.find(' ', start);
-
-    if (second == std::string_view::npos)
-        return sv.substr(start);
-
-    return sv.substr(start, second - start);
+    return sv.substr(start, end - start);
 }
+
 
 void testCountOnes()
 {
@@ -60,13 +79,11 @@ void testSecondWord()
     assert(secondWord(" a ") == "a");
     assert(secondWord("a  ") == "");
     assert(secondWord("a  b") == "");
-    assert(secondWord("hello     world    dear") == "world");
+    assert(secondWord("hello     world    dear") == "");
 }
 
 int main()
 {
     testCountOnes();
     testSecondWord();
-
-    std::cout << "All tests passed!\n";
 }
